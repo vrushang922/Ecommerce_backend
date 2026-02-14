@@ -1,0 +1,60 @@
+GET http://localhost:8000/products/?page=2
+
+
+###
+PATCH   http://localhost:8000/products/2/
+content-type : application/json
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY0NjE3MDkzLCJpYXQiOjE3NjQ2MTY3OTQsImp0aSI6ImYyZjk5MmVkOWMxYzQwY2RiZDEyZDMxOWRlZGE2M2RmIiwidXNlcl9pZCI6IjIifQ.vsQalX_q6FfNQlJNCX9secD2TeL2s3d9pLx1y9l4Vo0
+
+{"stock": 0}
+
+###
+
+POST  http://localhost:8000/auth/token/login
+Content-Type: application/json
+
+{"username": "kano", "password": "kano"}
+
+###
+
+GET http://localhost:8000/orders/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2ODY3MjcxLCJpYXQiOjE3NjY4NjY2NzEsImp0aSI6IjExMDk3MmU3NTdmYjQxNjU5MGRkYmFiMzFiYzFiNDdjIiwidXNlcl9pZCI6IjMifQ.TrXc8usfgmLmn6GFQRF0vqOMeU-YoGUfcyNrn9sBKCk
+
+###
+
+POST  http://localhost:8000/api/token/refresh/
+Content-Type: application/json
+
+{"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NDAxNDYwNCwiaWF0IjoxNzYzOTI4MjA0LCJqdGkiOiIwYzZmYzVhYmExMGU0NDg4ODE3Yjg0NDU4OWU1MjhlOSIsInVzZXJfaWQiOiIyIn0.Akw3UBUywTJ3FDK2ALx_-DlAPcWMPsQ18VWb9LJ9U3M"}
+
+###
+PUT  http://localhost:8000/orders/c042f5e7-8a64-410e-9dd2-7084c04d4415/
+content-type : application/json
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2MzI3Njg1LCJpYXQiOjE3NjYzMjcwODUsImp0aSI6IjA3YjcxNGM2Y2YxNTQxZWVhOGQzYTY2MjMyMmFjNjdhIiwidXNlcl9pZCI6IjIifQ.KpXgu0Q6o11KGXJFJgZFIiacemiySKKJpJlSgMUw-Bk
+
+{
+  "status": "Confirmed",
+  "items": [
+    { "product": 4, "quantity": 3 }
+  ]
+}
+
+###
+ 
+POST  http://localhost:8000/orders/
+content-type : application/json
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY3MzgyOTY1LCJpYXQiOjE3NjczODIzNjUsImp0aSI6IjM3ZjZjNWE2YTViNjQwYTJhZDVlNTk0MjNhNmY1OTFjIiwidXNlcl9pZCI6IjMifQ.9z4Tg_Gmwvyvv4pIKesrTRlINZCQnSAS2LT8mhnFxag
+
+{"status": "Confirmed", "items": [{"product": 10, "quantity": 4}]}
+
+
+###
+
+GET  http://localhost:8000/orders/c042f5e7-8a64-410e-9dd2-7084c04d4415/
+content-type : application/json
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2MzI1ODAxLCJpYXQiOjE3NjYzMjUyMDEsImp0aSI6ImZkZThmYTFlNzZiZTQwZTliNTA5NmUzMDVlODc3Y2FhIiwidXNlcl9pZCI6IjIifQ.GobRfIFViWILQiERWHUGvZI9tQT5_tKjtCwocDQsHOI
+
+
+###
+GET http://localhost:8000/auth/users/me
+Authorization : Token e7140bddfafb147dc9ae06804f0fa18b64d44551
