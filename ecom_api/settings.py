@@ -145,8 +145,8 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "PAGE_SIZE": 4,
 
-    #"DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.AnonRateThrottle", "rest_framework.throttling.ScopedRateThrottle"],
-    #"DEFAULT_THROTTLE_RATES" : {"anon": "2/minute", "products" : "4/minute", "orders" : "3/minute"}
+    "DEFAULT_THROTTLE_CLASSES": ["rest_framework.throttling.AnonRateThrottle", "rest_framework.throttling.ScopedRateThrottle"],
+    "DEFAULT_THROTTLE_RATES" : {"anon": "2/minute", "products" : "4/minute", "orders" : "3/minute"}
 
 }
 
@@ -164,18 +164,18 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=10),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1)}
 
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": "redis://127.0.0.1:6379/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         }
-#     }
-# }
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
-# CELERY_BROKER_URL = "redis://127.0.0.1:6379/1"
+CELERY_BROKER_URL = "redis://127.0.0.1:6379/1"
 
-# CELERY_BACKEND_RESULT = "redis://127.0.0.1:6379/1"
+CELERY_BACKEND_RESULT = "redis://127.0.0.1:6379/1"
 
-# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
