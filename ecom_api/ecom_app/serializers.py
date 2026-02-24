@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
         orders = obj.orders.all()
         for order in orders:
             if order.status == "Confirmed":
-                yield order.status
+                yield {"Confirmed" : order.order_id}
             continue
 
         #exclude = ("password", "orders")
