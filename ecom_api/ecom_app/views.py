@@ -1,5 +1,3 @@
-# classy django for detailed in drf 
-
 from rest_framework.decorators import api_view, parser_classes, action
 from .models import Product, Order, OrderItem, User
 from .serializers import ProductSerializer, OrderSerializer, ProductInfoSerializer, OrderItemSerializer, OrderCreateSerializer, UserSerializer
@@ -18,6 +16,7 @@ from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django.views.decorators.vary import vary_on_headers
 from .tasks import send_order_confirmation_email
+from .permissions import IsOwnerOrReadOnly
 
 
 """@api_view(["GET"])
@@ -76,15 +75,15 @@ class ProductListCreateView(generics.ListCreateAPIView):
     pagination_class.last_page_strings = "final"       """
 
 
-    # @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
+    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
     
 
-    # def get_queryset(self):
-    #     import time
-    #     time.sleep(2)
-    #     return super().get_queryset()
+    def get_queryset(self):
+        import time
+        time.sleep(2)
+        return super().get_queryset()
 
 
     def get_permissions(self):
@@ -111,8 +110,8 @@ class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
     lookup_url_kwarg = "product_id"
 
     def get_permissions(self):
-        self.permission_classes == [AllowAny]
-        if self.request.method in ["POST", "PUT", "PATCH", "DELETE"]:
+        self.permission_classes = [AllowAny]
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
             self.permission_classes = [IsAdminUser]
         return super().get_permissions()
     
@@ -145,7 +144,7 @@ def product_info(request):
 class ProductInfoView(APIView):
     def get(self, request, format = None):
         products = Product.objects.all()
-        serializer = ProductInfoSerializer({"products":products, "count": len(products),
+        serializer = ProductInfoSerializer({"products":products, "total": len(products),
                                          "max_price": products.aggregate(max_price = Max("price"))["max_price"]})
         return Response(serializer.data)
 
@@ -153,30 +152,39 @@ class ProductInfoView(APIView):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.prefetch_related("items__product")
     serializer_class = OrderSerializer 
-    permission_classes = [IsAuthenticated]
     pagination_class = None
     #pagination_class.page_query_param = "page_size"
 
     filterset_class = OrderFilter
     filter_backends = [DjangoFilterBackend]
-    throttle_scope = "orders"
+    # throttle_scope = "orders"
     
-    @method_decorator(cache_page(60 * 15, key_prefix = "order_list"))
-    @method_decorator(vary_on_headers("Authorization"))
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
+    # @method_decorator(cache_page(60 * 15, key_prefix = "order_list"))
+    # @method_decorator(vary_on_headers("Authorization"))
+    # def list(self, request, *args, **kwargs):
+    #     return super().list(request, *args, **kwargs)
 
     
-    def get_queryset(self):
-        qs = super().get_queryset()
-        if not self.request.user.is_staff:
-            qs = qs.filter(user=self.request.user)
-        return qs 
+    # def get_queryset(self):
+    #     qs = super().get_queryset()
+    #     if not self.request.user.is_staff:
+    #         qs = qs.filter(user=self.request.user)
+    #     return qs 
     
     def get_serializer_class(self):
-        if self.action == "create" or self.action == "update":
+        if self.action in ["create", "update", "partial_update"]:
             return OrderCreateSerializer
         return super().get_serializer_class()
+    
+    def get_permissions(self):
+        self.permission_classes = [AllowAny]
+        if self.action == "create":
+            self.permission_classes = [IsAuthenticated]
+        
+        if self.action in ["update", "partial_update", "destroy"]:
+            self.permission_classes = [IsOwnerOrReadOnly]
+
+        return super().get_permissions()
     
     
     def perform_create(self, serializer):

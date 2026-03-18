@@ -10,7 +10,7 @@ Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoi
 
 ###
 
-POST  http://localhost:8000/auth/token/login
+POST  http://localhost:8000/api/token/
 Content-Type: application/json
 
 {"username": "kano", "password": "kano"}
@@ -30,8 +30,7 @@ Content-Type: application/json
 ###
 PUT  http://localhost:8000/orders/c042f5e7-8a64-410e-9dd2-7084c04d4415/
 content-type : application/json
-Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzY2MzI3Njg1LCJpYXQiOjE3NjYzMjcwODUsImp0aSI6IjA3YjcxNGM2Y2YxNTQxZWVhOGQzYTY2MjMyMmFjNjdhIiwidXNlcl9pZCI6IjIifQ.KpXgu0Q6o11KGXJFJgZFIiacemiySKKJpJlSgMUw-Bk
-
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczNTE1Mzg1LCJpYXQiOjE3NzM1MTQ3ODUsImp0aSI6ImU4ODkxMWE2ZGE4YzRiZWY4YjU0NjBhMjUwMTZhMmU1IiwidXNlcl9pZCI6IjMifQ.G9xFH2L3UhbLs_MfHuwrvpbb7YimLekBxKYJNtq756A
 {
   "status": "Confirmed",
   "items": [

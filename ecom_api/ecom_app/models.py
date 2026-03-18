@@ -36,6 +36,14 @@ class Order(models.Model):
 
     status = models.CharField(max_length = 10, choices = StatusChoices.choices, default = StatusChoices.PENDING)
 
+    @property
+    def total(self):
+        return sum(item.sub_total for item in self.items.all())
+
+
+    def __str__(self):
+        return f"order for user {self.user.username}"
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete = models.CASCADE, related_name = "items")
@@ -48,4 +56,5 @@ class OrderItem(models.Model):
     
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in order {self.order.order_id}"
+
 
