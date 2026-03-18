@@ -18,6 +18,7 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -179,3 +180,16 @@ CELERY_BROKER_URL = "redis://127.0.0.1:6379/1"
 CELERY_BACKEND_RESULT = "redis://127.0.0.1:6379/1"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+
+"""
+start redis server - net start memurai 
+                    memurai-cli ping -> pong
+
+start celery - celery -A ecom_api worker -P solo -l info
+
+classy django for detailed drf methods and class information 
+
+"""
+
