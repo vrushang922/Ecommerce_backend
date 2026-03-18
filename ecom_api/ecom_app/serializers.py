@@ -8,30 +8,23 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ("username", "email", "is_authenticated", "status_detail")
 
-    # def status(self, obj):
-    #     orders = obj.orders.all()
-    #     for order in orders:
-    #         if order.status == "Confirmed":
-    #             yield {"Confirmed" : order.order_id}
-    #         continue
+    def status(self, obj):
+        orders = obj.orders.all()
+        for order in orders:
+            if order.status == "Confirmed":
+                yield {"Confirmed" : order.order_id}
+            continue
 
         #exclude = ("password", "orders")
         #fields = "__all__"
 
-    def status(self, obj):
-        orders = obj.orders.filter(status = "Confirmed")
-        confirmed_orders = []
-        for order in orders:
-            confirmed_orders.append(order.order_id)
-
-        return {"Confirmed_orders" : confirmed_orders}
 
 
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ("id", "name", "price", "stock")
+        fields = ("id","name", "price", "stock")
 
     def validate_price(self, value):
         if value <= 0:
@@ -40,9 +33,16 @@ class ProductSerializer(serializers.ModelSerializer):
     
 
 
+class OrderItemSerializer(serializers.ModelSerializer):
+    #product = ProductSerializer()
+    product = serializers.ReadOnlyField(source = "product.name")
+    #product = serializers.PrimaryKeyRelatedField(queryset= Product.objects.all(), write_only= True)
+    class Meta:
+        model = OrderItem
+        fields = ("product", "quantity")
 
 
-
+    
 class OrderCreateSerializer(serializers.ModelSerializer):
     class OrderItemCreateSerializer(serializers.ModelSerializer):
         class Meta:
@@ -88,44 +88,38 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         return instance
 
 
-class OrderItemSerializer(serializers.ModelSerializer):
-    #product = ProductSerializer()
-    product = serializers.ReadOnlyField(source = "product.name")
-    #product = serializers.PrimaryKeyRelatedField(queryset= Product.objects.all(), write_only= True)
-    class Meta:
-        model = OrderItem
-        fields = ("product", "quantity")
+
 
     
 class OrderSerializer(serializers.ModelSerializer):
-    user = serializers.ReadOnlyField(source = "user.username")
+    #user = serializers.ReadOnlyField(source = "user.username")
     items = OrderItemSerializer(many = True)
-    # order_id = serializers.UUIDField(read_only = True)
-    total = serializers.ReadOnlyField()
-    # order_detail = serializers.SerializerMethodField(method_name = "details")
+    order_id = serializers.UUIDField(read_only = True)
+    total = serializers.SerializerMethodField()
+    #order_detail = serializers.SerializerMethodField(method_name = "details")
 
-    # def create(self, validated_data):
-        # items = validated_data.pop("items")
-        # order = Order.objects.create(**validated_data)
+    def create(self, validated_data):
+        items = validated_data.pop("items")
+        order = Order.objects.create(**validated_data)
 
-        # for item in items:
-        #     OrderItem.objects.create(order=order, product = item["product"], quantity = item["quantity"])
+        for item in items:
+            OrderItem.objects.create(order=order, product = item["product"], quantity = item["quantity"])
 
-        # return order
-
-
-    # def details(self,obj):
-    #     items = obj.items.all()
-    #     for item in items:
-    #         yield {"name":item.product.name,
-    #                 "price":item.product.price,
-    #                 "quantity":item.quantity} 
+        return order
 
 
+    """def details(self,obj):
+        items = obj.items.all()
+        for item in items:
+            yield {"name":item.product.name,
+                    "price":item.product.price,
+                    "quantity":item.quantity}   """
 
-    # def get_total(self,obj):
-    #     order_items = obj.items.all()
-    #     return sum(order_item.sub_total for order_item in order_items)
+
+
+    def get_total(self,obj):
+        order_items = obj.items.all()
+        return sum(order_item.sub_total for order_item in order_items)
 
 
     class Meta:
@@ -134,7 +128,6 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class ProductInfoSerializer(serializers.Serializer):
     products = ProductSerializer(many= True)
-    total = serializers.IntegerField()
+    count = serializers.IntegerField()
     max_price = serializers.DecimalField(max_digits = 10, decimal_places = 2)
-
 
