@@ -1,0 +1,6 @@
+ecom_api/__pycache__/settings.cpython-311.pyc
+ecom_api/__pycache__/urls.cpython-311.pyc
+ecom_api/ecom_app/__pycache__/models.cpython-311.pyc
+ecom_api/ecom_app/__pycache__/permissions.cpython-311.pyc
+ecom_api/ecom_app/__pycache__/views.cpython-311.pyc
+db.sqlite3
