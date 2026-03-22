@@ -19,6 +19,142 @@ from .tasks import send_order_confirmation_email
 from .permissions import IsOwnerOrReadOnly
 
 
+
+
+class ProductListCreateView(generics.ListCreateAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ("name", "price")
+    filterset_class = ProductFilter
+    search_fields = ["name"]
+    ordering_fields = ["name", "price"]
+    # throttle_scope = "products"
+    pagination_class = None
+ 
+    # pagination_class = CursorPagination
+    # pagination_class.ordering = "id"
+
+    """pagination_class.default_limit = 5
+    pagination_class.max_limit = 10
+    pagination_class.offset_query_param = "subset" """
+
+
+    """ pagination_class = PageNumberPagination
+    pagination_class.page_size = 2
+    pagination_class.page_query_param = "page-num"
+    pagination_class.page_size_query_param = "size-num"
+    pagination_class.max_page_size = 12
+    pagination_class.last_page_strings = "final"     """
+
+
+    @method_decorator(cache_page(60 * 6, key_prefix="product_list"))
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+    
+
+    # def get_queryset(self):
+    #     import time
+    #     time.sleep(2)
+    #     return super().get_queryset()
+
+
+    def get_permissions(self):
+        self.permission_classes = [AllowAny]
+        if self.request.method == "POST":
+            self.permission_classes = [IsAuthenticated]
+        return super().get_permissions()
+
+
+
+class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    lookup_url_kwarg = "product_id"
+
+    def get_permissions(self):
+        self.permission_classes = [AllowAny]
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
+    
+
+
+
+class ProductInfoView(APIView):
+    def get(self, request, format = None):
+        products = Product.objects.all()
+        serializer = ProductInfoSerializer({"products":products, "total": len(products),
+                                         "max_price": products.aggregate(max_price = Max("price"))["max_price"]})
+        return Response(serializer.data)
+
+
+class OrderViewSet(viewsets.ModelViewSet):
+    queryset = Order.objects.prefetch_related("items__product")
+    serializer_class = OrderSerializer 
+    pagination_class = None
+    #pagination_class.page_query_param = "page_size"
+
+    filterset_class = OrderFilter
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["status", "created_at"]
+    # throttle_scope = "orders"
+    
+    # @method_decorator(cache_page(60 * 15, key_prefix = "order_list"))
+    # @method_decorator(vary_on_headers("Authorization"))
+    # def list(self, request, *args, **kwargs):
+    #     return super().list(request, *args, **kwargs)
+
+    
+    # def get_queryset(self):
+    #     qs = super().get_queryset()
+    #     if not self.request.user.is_staff:
+    #         qs = qs.filter(user=self.request.user)
+    #     return qs
+    
+    def get_serializer_class(self):
+        if self.action in ["create", "update", "partial_update", "destroy"]:
+            return OrderCreateSerializer
+        return super().get_serializer_class()
+    
+    def get_permissions(self):
+        self.permission_classes = [AllowAny]
+        if self.action == "create":
+            self.permission_classes = [IsAuthenticated]
+        
+        if self.action in ["update", "partial_update", "destroy"]:
+            self.permission_classes = [IsOwnerOrReadOnly]
+
+        return super().get_permissions()
+    
+    
+    def perform_create(self, serializer):
+        order = serializer.save(user = self.request.user)
+        items = order.items.all()
+        product = []
+        for item in items:
+            name = item.product.name
+            product.append(name)
+        send_order_confirmation_email.delay(order.order_id, self.request.user.email, product[0])
+
+
+    @action(methods=["GET"], url_path = "user-orders", detail = False)
+    def user_order(self, request):
+        orders = self.get_queryset().filter(user= request.user)
+        serializer = self.get_serializer(orders, many = True)
+        return Response(serializer.data)
+
+
+
+class UserListView(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    pagination_class = None
+
+
+
+
 """@api_view(["GET"])
 def product_list(request):
     #products = Product.objects.all()
@@ -45,52 +181,7 @@ def product_create(request):
     model = Product
     serializer_class = ProductSerializer"""
 
-class ProductListCreateView(generics.ListCreateAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    filterset_fields = ("name", "price")
-    filterset_class = ProductFilter
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ["name"]
-    ordering_fields = ["name", "price"]
-    throttle_scope = "products"
- 
-    """pagination_class = CursorPagination
-    pagination_class.ordering = "id"  """
 
-
-    pagination_class = None
-
-
-    """pagination_class.default_limit = 5
-    pagination_class.max_limit = 10
-    pagination_class.offset_query_param = "subset" """
-
-
-    """ pagination_class = PageNumberPagination
-    pagination_class.page_size = 2
-    pagination_class.page_query_param = "page-num"
-    pagination_class.page_size_query_param = "size-num"
-    pagination_class.max_page_size = 12
-    pagination_class.last_page_strings = "final"       """
-
-
-    @method_decorator(cache_page(60 * 15, key_prefix="product_list"))
-    def list(self, request, *args, **kwargs):
-        return super().list(request, *args, **kwargs)
-    
-
-    def get_queryset(self):
-        import time
-        time.sleep(2)
-        return super().get_queryset()
-
-
-    def get_permissions(self):
-        self.permission_classes = [AllowAny]
-        if self.request.method == "POST":
-            self.permission_classes = [IsAuthenticated]
-        return super().get_permissions()
 
 
 """@api_view(["GET"])
@@ -104,107 +195,13 @@ def order_list(request):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer"""
 
-class ProductDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    lookup_url_kwarg = "product_id"
-
-    def get_permissions(self):
-        self.permission_classes = [AllowAny]
-        if self.request.method in ["PUT", "PATCH", "DELETE"]:
-            self.permission_classes = [IsAdminUser]
-        return super().get_permissions()
-    
-
-"""  class OrderListView(generics.ListAPIView):
-    queryset = Order.objects.prefetch_related("items__product")
-    serializer_class = OrderSerializer
-
-
-class UserOrderListView(generics.ListAPIView):
-    #queryset = Order.objects.prefetch_related("items__product")
-    serializer_class = OrderSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        return(Order.objects.filter(user= self.request.user).prefetch_related("items__product"))  """
 
 
 
+# class UserOrderListView(generics.ListAPIView):
+#     #queryset = Order.objects.prefetch_related("items__product")
+#     serializer_class = OrderSerializer
+#     permission_classes = [IsAuthenticated]
 
-"""@api_view(["GET"])
-def product_info(request):
-    products = Product.objects.all()
-    serializer = ProductInfoSerializer({"products":products, "count": len(products),
-                                         "max_price": products.aggregate(max_price = Max("price"))["max_price"]})
-    return Response(serializer.data)"""
-
-
-
-class ProductInfoView(APIView):
-    def get(self, request, format = None):
-        products = Product.objects.all()
-        serializer = ProductInfoSerializer({"products":products, "total": len(products),
-                                         "max_price": products.aggregate(max_price = Max("price"))["max_price"]})
-        return Response(serializer.data)
-
-
-class OrderViewSet(viewsets.ModelViewSet):
-    queryset = Order.objects.prefetch_related("items__product")
-    serializer_class = OrderSerializer 
-    pagination_class = None
-    #pagination_class.page_query_param = "page_size"
-
-    filterset_class = OrderFilter
-    filter_backends = [DjangoFilterBackend]
-    # throttle_scope = "orders"
-    
-    # @method_decorator(cache_page(60 * 15, key_prefix = "order_list"))
-    # @method_decorator(vary_on_headers("Authorization"))
-    # def list(self, request, *args, **kwargs):
-    #     return super().list(request, *args, **kwargs)
-
-    
-    # def get_queryset(self):
-    #     qs = super().get_queryset()
-    #     if not self.request.user.is_staff:
-    #         qs = qs.filter(user=self.request.user)
-    #     return qs 
-    
-    def get_serializer_class(self):
-        if self.action in ["create", "update", "partial_update"]:
-            return OrderCreateSerializer
-        return super().get_serializer_class()
-    
-    def get_permissions(self):
-        self.permission_classes = [AllowAny]
-        if self.action == "create":
-            self.permission_classes = [IsAuthenticated]
-        
-        if self.action in ["update", "partial_update", "destroy"]:
-            self.permission_classes = [IsOwnerOrReadOnly]
-
-        return super().get_permissions()
-    
-    
-    def perform_create(self, serializer):
-        order = serializer.save(user = self.request.user)
-        send_order_confirmation_email.delay(order.order_id, self.request.user.email)
-
-
-    """@action(methods=["GET"], url_path = "user-orders", detail = False)
-     def user_order(self, request):
-        orders = self.get_queryset().filter(user= request.user)
-        serializer = self.get_serializer(orders, many = True)
-        return Response(serializer.data)   """ 
-
-
-
-"""class OrderItemViewSet(viewsets.ModelViewSet):
-    serializer_class = OrderItemSerializer
-    queryset = OrderItem.objects.all() """
-
-class UserListView(generics.ListAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    pagination_class = None
+#     def get_queryset(self):
+#         return(Order.objects.filter(user= self.request.user).prefetch_related("items__product"))

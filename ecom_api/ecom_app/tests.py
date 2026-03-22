@@ -57,10 +57,3 @@ class ProductDetailTest(APITestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertFalse(Product.objects.filter(id = self.product.pk).exists())
-
-
-
-
-
-
-

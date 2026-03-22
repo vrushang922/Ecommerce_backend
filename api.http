@@ -28,13 +28,14 @@ Content-Type: application/json
 {"refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc2NDAxNDYwNCwiaWF0IjoxNzYzOTI4MjA0LCJqdGkiOiIwYzZmYzVhYmExMGU0NDg4ODE3Yjg0NDU4OWU1MjhlOSIsInVzZXJfaWQiOiIyIn0.Akw3UBUywTJ3FDK2ALx_-DlAPcWMPsQ18VWb9LJ9U3M"}
 
 ###
-PUT  http://localhost:8000/orders/c042f5e7-8a64-410e-9dd2-7084c04d4415/
+POST   http://localhost:8000/orders/
 content-type : application/json
-Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzczNTE1Mzg1LCJpYXQiOjE3NzM1MTQ3ODUsImp0aSI6ImU4ODkxMWE2ZGE4YzRiZWY4YjU0NjBhMjUwMTZhMmU1IiwidXNlcl9pZCI6IjMifQ.G9xFH2L3UhbLs_MfHuwrvpbb7YimLekBxKYJNtq756A
+Authorization : Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzc0MTI1NjE3LCJpYXQiOjE3NzQxMjUwMTcsImp0aSI6IjA5NmIzYjk3OWYxMzRmYmE5NDAyMzJkMjMwYjAxMTdiIiwidXNlcl9pZCI6IjMifQ.G8GarQnpV11hNgvjGbzl_9EONBxu865H23nD_bXBRow
+
 {
   "status": "Confirmed",
   "items": [
-    { "product": 4, "quantity": 3 }
+    { "product": 7, "quantity": 2 }
   ]
 }
 

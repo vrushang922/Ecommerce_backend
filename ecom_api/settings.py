@@ -13,6 +13,10 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 from datetime import timedelta
+from dotenv import load_dotenv 
+import os
+
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-%hc&*0ov8w3yoz=2#ec*06-0h_am5b5gd_8um$%uvsq9$ni+px"
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -183,9 +187,24 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 
 
+
+
+
+
+
+
 """
 start redis server - net start memurai 
                     memurai-cli ping -> pong
+
+memurai-cli to use redis cli 
+
+select 1 to select db 1 
+
+then keys * to show all cache keys 
+
+
+
 
 start celery - celery -A ecom_api worker -P solo -l info
 
