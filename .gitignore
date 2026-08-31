@@ -8,4 +8,6 @@ db.sqlite3
 __pycache__/
 *.pyc
 db.sqlite3
-venv/
+env/
+ecom_api/ecom_app/__pycache__/serializers.cpython-311.pyc
+env/Lib/site-packages/django/core/servers/__pycache__/basehttp.cpython-311.pyc
