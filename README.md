@@ -76,7 +76,7 @@ A backend e-commerce REST API built with **Django** and **Django REST Framework*
 ### 1. Clone the repository
 
 ```bash
-git clone 
+git clone https://github.com/vrushang922/Ecommerce_backend.git
 cd ecommerce_app
 ```
 
