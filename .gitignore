@@ -5,7 +5,7 @@ ecom_api/ecom_app/__pycache__/permissions.cpython-311.pyc
 ecom_api/ecom_app/__pycache__/views.cpython-311.pyc
 db.sqlite3
 .env
-*__pycache__/
+*__pycache__*/
 *.pyc
 db.sqlite3
 env/
@@ -14,3 +14,6 @@ env/Lib/site-packages/django/core/servers/__pycache__/basehttp.cpython-311.pyc
 api.http
 ecom_api/ecom_app/__pycache__/serializers.cpython-311.pyc
 sample.txt
+ecom_api/__pycache__/__init__.cpython-311.pyc
+ecom_api/__pycache__
+data.json
